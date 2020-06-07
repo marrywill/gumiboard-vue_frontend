@@ -19,14 +19,16 @@ export default new Vuex.Store({
 	getters: {
 		isAuthenticated(state) {
 			state.accessToken = state.accessToken || localStorage.getItem('token')
-			return state.accessToken
+			return !!state.accessToken
+		},
+		loginUser(state) {
+			return state.loginUser
 		},
 	},
 	mutations: {
 		loginSuccess(state, { token, user }) {
 			state.accessToken = token
 			state.loginUser = user
-			localStorage.setItem('token', token)
 		},
 		logout(state) {
 			state.loginUser = null
@@ -38,18 +40,29 @@ export default new Vuex.Store({
 		},
 	},
 	actions: {
-		login({ commit }, { username, password }) {
+		login({ dispatch }, { username, password }) {
 			axiosInstance
 				.post('/rest-auth/login/', { username, password })
 				.then((res) => {
-					commit('loginSuccess', res.data)
-					axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
+					localStorage.setItem('token', res.data.token)
+					// axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
+					dispatch('getLoginUser')
 				})
-				.catch((err) => console.log(err))
+				.catch(() => {
+					alert('아이디 비밀번호를 확인해주세요')
+				})
+		},
+		getLoginUser({ commit }) {
+			const token = localStorage.getItem('token')
+			axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`
+			axiosInstance.get('내정보받아올 주소').then((res) => {
+				commit('loginSuccess', res.data)
+			})
 		},
 		logout({ commit }) {
 			commit('logout')
-			axiosInstance.defaults.headers.commit['Authorization'] = null
+			console.log('logout')
+			axiosInstance.defaults.headers.common['Authorization'] = null
 		},
 		signUp(_, { username, nickname, password1, password2 }) {
 			axiosInstance

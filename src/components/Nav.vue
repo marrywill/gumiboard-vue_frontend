@@ -1,11 +1,11 @@
 <template>
   <div id="nav">
     <router-link to="/">Home</router-link>|
-    <span class="auth" v-if="!isAuthenticated">
+    <a href v-if="isAuthenticated" @click.prevent="logOutClick">Logout</a>
+    <span class="auth" v-else>
       <router-link to="/signup">SignUp</router-link>|
       <router-link to="/login">Login</router-link>
     </span>
-    <a href v-else @click.prevent="logOutClick">Logout</a>
   </div>
 </template>
 

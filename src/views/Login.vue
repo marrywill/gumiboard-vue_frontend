@@ -5,7 +5,6 @@
       <input type="password" v-model="password" />
       <input type="submit" value="Login" />
     </form>
-    <p>{{ msg }}</p>
   </div>
 </template>
 
@@ -14,7 +13,6 @@ import { mapActions } from "vuex";
 export default {
   data() {
     return {
-      msg: "",
       username: "",
       password: ""
     };
@@ -22,12 +20,13 @@ export default {
   methods: {
     ...mapActions(["login"]),
     submitLogin() {
-      this.login({
+      const check = this.login({
         username: this.username,
         password: this.password
-      })
-        .then(() => this.$router.go(-1))
-        .catch(({ message }) => (this.msg = message));
+      });
+      if (check) {
+        this.$router.push({ name: "Home" });
+      }
     }
   }
 };
