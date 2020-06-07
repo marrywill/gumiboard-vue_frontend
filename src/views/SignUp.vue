@@ -24,12 +24,15 @@ export default {
   methods: {
     ...mapActions(["signUp"]),
     submitSignUp() {
-      this.signUp({
-        username: this.username,
-        nickname: this.nickname,
-        password1: this.password1,
-        password2: this.password2
-      });
+      if (this.password1 === this.password2) {
+        this.signUp({
+          username: this.username,
+          nickname: this.nickname,
+          password: this.password1
+        });
+      } else {
+        alert("비밀번호가 일치하지 않습니다");
+      }
     }
   }
 };

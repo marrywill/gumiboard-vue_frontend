@@ -54,8 +54,9 @@ export default new Vuex.Store({
 		},
 		getLoginUser({ commit }) {
 			const token = localStorage.getItem('token')
-			axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`
-			axiosInstance.get('내정보받아올 주소').then((res) => {
+			axiosInstance.defaults.headers.common['Authorization'] = `JWT ${token}`
+			console.log(axiosInstance.defaults.headers)
+			axiosInstance.get('/accounts/me/').then((res) => {
 				commit('loginSuccess', res.data)
 			})
 		},
@@ -64,9 +65,10 @@ export default new Vuex.Store({
 			console.log('logout')
 			axiosInstance.defaults.headers.common['Authorization'] = null
 		},
-		signUp(_, { username, nickname, password1, password2 }) {
+		signUp(_, { username, nickname, password }) {
+			console.log(axiosInstance.defaults.headers)
 			axiosInstance
-				.post('/rest-auth/registration/', { username, nickname, password1, password2 })
+				.post('/accounts/', { username, nickname, password })
 				.then()
 				.catch((err) => console.log(err))
 		},
