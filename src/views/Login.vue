@@ -20,13 +20,11 @@ export default {
   methods: {
     ...mapActions(["login"]),
     submitLogin() {
-      const check = this.login({
+      this.login({
         username: this.username,
         password: this.password
       });
-      if (check) {
-        this.$router.push({ name: "Home" });
-      }
+      this.$router.push({ name: "Home" });
     }
   }
 };

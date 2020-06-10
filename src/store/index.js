@@ -26,14 +26,13 @@ export default new Vuex.Store({
 		},
 	},
 	mutations: {
-		loginSuccess(state, { token, user }) {
-			state.accessToken = token
+		loginSuccess(state, { key, user }) {
+			state.accessToken = key
 			state.loginUser = user
 		},
 		logout(state) {
 			state.loginUser = null
 			state.accessToken = null
-			localStorage.removeItem('token')
 		},
 		profile(state, payload) {
 			state.profileUser = payload
@@ -44,38 +43,52 @@ export default new Vuex.Store({
 			axiosInstance
 				.post('/rest-auth/login/', { username, password })
 				.then((res) => {
-					localStorage.setItem('token', res.data.token)
-					// axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
+					localStorage.setItem('token', res.data.key)
 					dispatch('getLoginUser')
 				})
-				.catch(() => {
+				.catch((err) => {
 					alert('아이디 비밀번호를 확인해주세요')
+					console.log(err.response)
 				})
 		},
 		getLoginUser({ commit }) {
 			const token = localStorage.getItem('token')
-			axiosInstance.defaults.headers.common['Authorization'] = `JWT ${token}`
+			axiosInstance.defaults.headers.common['Authorization'] = `Token ${token}`
 			console.log(axiosInstance.defaults.headers)
-			axiosInstance.get('/accounts/me/').then((res) => {
-				commit('loginSuccess', res.data)
-			})
+			axiosInstance
+				.get('/accounts/me/')
+				.then((res) => {
+					commit('loginSuccess', res.data)
+				})
+				.catch((err) => {
+					console.log(err.response)
+				})
 		},
 		logout({ commit }) {
 			commit('logout')
+			localStorage.removeItem('token')
 			console.log('logout')
 			axiosInstance.defaults.headers.common['Authorization'] = null
 		},
-		signUp(_, { username, nickname, password }) {
-			console.log(axiosInstance.defaults.headers)
+		signUp(_, { username, password1, password2 }) {
 			axiosInstance
-				.post('/accounts/', { username, nickname, password })
-				.then()
-				.catch((err) => console.log(err))
+				.post('/rest-auth/registration/', { username, password1, password2 })
+				.then((res) => {
+					console.log(res.data)
+				})
+				.catch((err) => {
+					console.log(err.response)
+				})
 		},
 		profile({ commit }, { user: { id } }) {
-			axiosInstance.get(`/accounts/${id}/`).then((res) => {
-				commit('profile', res.data)
-			})
+			axiosInstance
+				.get(`/accounts/${id}/`)
+				.then((res) => {
+					commit('profile', res.data)
+				})
+				.catch((err) => {
+					console.log(err.response)
+				})
 		},
 	},
 	modules: {},
